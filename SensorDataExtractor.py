@@ -21,7 +21,6 @@ from plotly.subplots import make_subplots
 
 # plotly.offline.init_notebook_mode(connected=True)
 
-
 @Gooey
 def main():
     #################### ARGUMENT PARSER ####################
