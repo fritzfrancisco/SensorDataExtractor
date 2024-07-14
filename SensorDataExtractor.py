@@ -26,7 +26,7 @@ from plotly.subplots import make_subplots
 def main():
     #################### ARGUMENT PARSER ####################
     # parser = argparse.ArgumentParser()
-    parser = GooeyParser(description="Sensor Data Logger")
+    parser = GooeyParser(description="A simple GUI to help align and extract sensor data")
 
     # Input files from sensors
     parser.add_argument(
