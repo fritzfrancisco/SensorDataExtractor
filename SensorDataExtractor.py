@@ -26,13 +26,14 @@ from plotly.subplots import make_subplots
 def main():
     #################### ARGUMENT PARSER ####################
     # parser = argparse.ArgumentParser()
-    parser = GooeyParser(description="A simple GUI to help align and extract sensor data")
+    parser = GooeyParser(description="Sensor Data Logger")
 
     # Input files from sensors
     parser.add_argument(
         "-temp",
         "--temp_light",
         help="Logger output for tempueratur and light (.xlsx)",
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/lighttemp_11Jul2024.xlsx",
         widget="FileChooser",
         required=True,
     )
@@ -40,6 +41,7 @@ def main():
         "-ph",
         "--ph",
         help="Logger output for pH (.xlsx)",
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/ph_11Jul2024.xlsx",
         widget="FileChooser",
         required=True,
     )
@@ -47,6 +49,7 @@ def main():
         "-co",
         "--conductivity",
         help="Logger output for conductivity (.csv)",
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/conductivity_11Jul2024.csv",
         widget="FileChooser",
         required=True,
     )
@@ -54,6 +57,7 @@ def main():
         "-do",
         "--dissolved_oxygen",
         help="Logger output for dissolved oxygen (.txt)",
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/do_11Jul2024.TXT",
         widget="FileChooser",
         required=True,
     )
@@ -61,6 +65,7 @@ def main():
         "-cu",
         "--current",
         help="Logger output for current meter (.csv)",
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/current_11Jul2024.csv",
         widget="FileChooser",
         required=True,
     )
@@ -68,6 +73,7 @@ def main():
         "-ds",
         "--datasheet",
         help='Datasheet containing dates and times at which to extract sensor data. (Column Format: "Date": "2024-07-11"; "Abiotics in": "15:08:00")(.xlsx)',
+        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/TranslocationExperiment_DataEntry_20240713.xlsx",
         widget="FileChooser",
         required=False,
     )
@@ -453,6 +459,7 @@ def main():
                             line=dict(color="#080061"),
                             opacity=.2,
                             showlegend=False,
+                            name="",
                             hovertext=label,
                             zorder=-1,
                         ),
