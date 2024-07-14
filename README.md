@@ -12,7 +12,7 @@ A simple GUI to extract data at given timestamps from multi-sensor data (temp., 
 ```cd /path/to/SensorDataExtractor/directory```  
 ```chmod +x SensorDataExtractor.py```
 
-3. To start the GUI:
+3. To start the GUI:  
 ```conda activate behavior```  
 ```./SensorDataExtractor.py```
 
