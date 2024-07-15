@@ -18,4 +18,8 @@ A simple GUI to extract data at given timestamps from multi-sensor data (Tempera
 ```conda activate behavior```  
 ```./SensorDataExtractor.py```
 
-
+5. **[Optional]** Install [pyinstaller](https://pyinstaller.org/en/stable/) to create a standalone executable file  
+```pip install pyinstaller```  
+```pyinstaller SensorDataExtractor.py```  
+This will create a ```dist``` folder in the current directory in which there should be an executable file.  
+This allows the program to be started with a double-click.  
