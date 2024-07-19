@@ -239,6 +239,7 @@ def main():
 
                 for index, row in timestamp_rows.iterrows():
                     out = []
+                    # sensor_names = ["Temperature", "pH", "Conductivity", "DO", "Current"]
                     for i, sensor_data in enumerate(
                         [templight, ph, conductivity, do, current]
                     ):
@@ -252,7 +253,10 @@ def main():
                         if i == 0:
                             sensor_value["Tag"] = row["Tag"]
                             sensor_value["Reef"] = row["Reef"]
+                            sensor_value["PNG Timestamp"] = time
                         else:
+                            ## Rename timestamp column
+                            # sensor_value.rename(columns={"PNG Timestamp": "PNG Timestamp {}".format(sensor_names[i])}, inplace=True)
                             sensor_value = sensor_value.drop("PNG Timestamp", axis=1)
                         out.append(sensor_value.reset_index(drop=True))
                     out = pd.concat(out, axis=1)
@@ -275,6 +279,11 @@ def main():
             axis=1,
         )
 
+        ## Switch column order [Reef, Tag, Date, PNG Timestamp ]
+        for column in ["PNG Timestamp", "Tag", "Reef"]:
+            selected_column = output.pop(column) 
+            output.insert(0, column, selected_column) 
+
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         filename = "{}/sensor_output_{}.csv".format(args.output, timestamp)
         output.to_csv(filename, index=False)
@@ -284,7 +293,10 @@ def main():
     if args.visualize == True:
         try:
             ylim_values = []
-            fig = make_subplots(rows=6, cols=1, shared_xaxes=True)
+            fig = make_subplots(
+                rows=6,
+                cols=1,
+                shared_xaxes=True)
 
             # Light
             fig.add_trace(
@@ -441,22 +453,27 @@ def main():
                 row=6,
                 col=1,
             )
-            ylim_values.append([do["Dissolved Oxygen (mg/l)"].min(),do["Dissolved Oxygen (mg/l)"].max()])
+            ylim_values.append(
+                [
+                    do["Dissolved Oxygen (mg/l)"].min(),
+                    do["Dissolved Oxygen (mg/l)"].max(),
+                ]
+            )
 
             # Add vertical lines to each subplot
             for time in sampling_times:
                 label = ""
-                for t in output[output['PNG Timestamp'] == time]["Tag"].to_numpy():
+                for t in output[output["PNG Timestamp"] == time]["Tag"].to_numpy():
                     label += t + " "
-                for r in np.arange(1,7):
+                for r in np.arange(1, 7):
                     fig.add_trace(
                         go.Scatter(
                             x=[time, time],
-                            y=[ylim_values[r-1][0], ylim_values[r-1][1]],
+                            y=[ylim_values[r - 1][0], ylim_values[r - 1][1]],
                             mode="lines",
                             line_width=1,
                             line=dict(color="#080061"),
-                            opacity=.2,
+                            opacity=0.2,
                             showlegend=False,
                             name="",
                             hovertext=label,
@@ -465,7 +482,6 @@ def main():
                         row=r,
                         col=1,
                     )
-
 
             fig.update_layout(
                 title_text="Sensor Data",
