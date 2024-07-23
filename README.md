@@ -23,3 +23,6 @@ A simple GUI to extract data at given timestamps from multi-sensor data (Tempera
 ```pyinstaller SensorDataExtractor.py --hidden-import openpyxl.cell._writer```  
 This will create a ```dist``` folder in the current directory in which there should be an executable file.  
 This allows the program to be started with a double-click.  
+
+6. For conversion from raw 3D sensor output (Accelerometer (g) & Magnetometer (mG) ) to water speed (m/s):  
+Use [Calibration Curve](https://github.com/LowellInstruments/Domino/blob/master/gui/Calibration%20Tables/TCM-1%2C%20No%20Ballast%20Washer%2C%20Salt%20Water.cal)
