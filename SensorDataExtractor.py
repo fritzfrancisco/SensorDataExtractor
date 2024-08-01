@@ -253,6 +253,7 @@ def main():
                         if i == 0:
                             sensor_value["Tag"] = row["Tag"]
                             sensor_value["Reef"] = row["Reef"]
+                            sensor_value["Depth"] = row["Depth"]
                             sensor_value["PNG Timestamp"] = time
                         else:
                             ## Rename timestamp column
@@ -280,7 +281,7 @@ def main():
         )
 
         ## Switch column order [Reef, Tag, Date, PNG Timestamp ]
-        for column in ["PNG Timestamp", "Tag", "Reef"]:
+        for column in ["Depth", "PNG Timestamp", "Tag", "Reef"]:
             selected_column = output.pop(column) 
             output.insert(0, column, selected_column) 
 
