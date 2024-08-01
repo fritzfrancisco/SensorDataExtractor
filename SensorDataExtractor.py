@@ -335,49 +335,17 @@ def main():
             fig.add_trace(
                 go.Scatter(
                     x=current["PNG Timestamp"],
-                    y=current["Ax (g)"],
+                    y=current["Speed (m/s)"],
                     mode="lines",
-                    name="Ax",
-                ),
-                row=3,
-                col=1,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=current["PNG Timestamp"],
-                    y=current["Ay (g)"],
-                    mode="lines",
-                    name="Ay",
-                ),
-                row=3,
-                col=1,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=current["PNG Timestamp"],
-                    y=current["Az (g)"],
-                    mode="lines",
-                    name="Az",
+                    name="Current Speed",
                 ),
                 row=3,
                 col=1,
             )
             ylim_values.append(
                 [
-                    np.min(
-                        [
-                            current["Ax (g)"].min(),
-                            current["Ay (g)"].min(),
-                            current["Az (g)"].min(),
-                        ]
-                    ),
-                    np.max(
-                        [
-                            current["Ax (g)"].max(),
-                            current["Ay (g)"].max(),
-                            current["Az (g)"].max(),
-                        ]
-                    ),
+                    np.min(current["Speed (m/s)"]),
+                    np.max(current["Speed (m/s)"),
                 ]
             )
 
@@ -505,15 +473,9 @@ def main():
 
             # Current
             sns.lineplot(
-                data=current, x="PNG Timestamp", y="Ax (g)", label="Ax", ax=ax[1]
+                data=current, x="PNG Timestamp", y="Speed (m/s)", label="Current Speed", ax=ax[1]
             )
-            sns.lineplot(
-                data=current, x="PNG Timestamp", y="Ay (g)", label="Ay", ax=ax[1]
-            )
-            sns.lineplot(
-                data=current, x="PNG Timestamp", y="Az (g)", label="Az", ax=ax[1]
-            )
-
+        
             # pH
             sns.lineplot(data=ph, x="PNG Timestamp", y="pH (pH) ", ax=ax[2])
 
