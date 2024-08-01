@@ -335,7 +335,7 @@ def main():
             fig.add_trace(
                 go.Scatter(
                     x=current["PNG Timestamp"],
-                    y=current["Speed (m/s)"],
+                    y=current["Speed (cm/s)"],
                     mode="lines",
                     name="Current Speed",
                 ),
@@ -344,8 +344,8 @@ def main():
             )
             ylim_values.append(
                 [
-                    np.min(current["Speed (m/s)"]),
-                    np.max(current["Speed (m/s)"]),
+                    np.min(current["Speed (cm/s)"]),
+                    np.max(current["Speed (cm/s)"]),
                 ]
             )
 
@@ -473,7 +473,7 @@ def main():
 
             # Current
             sns.lineplot(
-                data=current, x="PNG Timestamp", y="Speed (m/s)", label="Current Speed", ax=ax[1]
+                data=current, x="PNG Timestamp", y="Speed (cm/s)", label="Current Speed", ax=ax[1]
             )
         
             # pH
