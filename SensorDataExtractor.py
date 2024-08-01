@@ -345,7 +345,7 @@ def main():
             ylim_values.append(
                 [
                     np.min(current["Speed (m/s)"]),
-                    np.max(current["Speed (m/s)"),
+                    np.max(current["Speed (m/s)"]),
                 ]
             )
 
