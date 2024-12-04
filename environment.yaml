@@ -4,24 +4,23 @@ channels:
 dependencies:
   - numpy
   - pandas
-  - python=3.11
+  - python=3.10
   - seaborn
   - jupyterlab
   - conda-forge::pytesseract
   - scipy
-  - jupyter_contrib_nbextensions
   - ipympl
   - nodejs
-  - jupyter
-  - notebook
   - conda-forge::opencv
   - imageio
   - scikit-learn
   - openpyxl
+  - conda-forge::gooey
   - conda-forge::configparser
   - conda-forge::paho-mqtt
   - conda-forge::pendulum
   - numba
   - pytables
   - plotly::plotly
+  
 prefix: /home/fritz/miniconda3/envs/behavior
