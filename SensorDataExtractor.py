@@ -32,7 +32,7 @@ def main():
         "-temp",
         "--temp_light",
         help="Logger output for tempueratur and light (.xlsx)",
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/lighttemp_11Jul2024.xlsx",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/CombinedAbiotics/merged_light_temp-20241204-124521.xlsx",
         widget="FileChooser",
         required=True,
     )
@@ -40,7 +40,7 @@ def main():
         "-ph",
         "--ph",
         help="Logger output for pH (.xlsx)",
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/ph_11Jul2024.xlsx",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/CombinedAbiotics/merged_pH-20241204-124524.xlsx",
         widget="FileChooser",
         required=True,
     )
@@ -48,7 +48,7 @@ def main():
         "-co",
         "--conductivity",
         help="Logger output for conductivity (.csv)",
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/conductivity_11Jul2024.csv",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/CombinedAbiotics/merged_conductivity-20241204-124813.csv",
         widget="FileChooser",
         required=True,
     )
@@ -56,7 +56,7 @@ def main():
         "-do",
         "--dissolved_oxygen",
         help="Logger output for dissolved oxygen (.txt)",
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/do_11Jul2024.TXT",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/CombinedAbiotics/merged_dissolved_oxygen-20241204-124530.txt",
         widget="FileChooser",
         required=True,
     )
@@ -64,7 +64,7 @@ def main():
         "-cu",
         "--current",
         help="Logger output for current meter (.csv)",
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/11Jul2024/current_11Jul2024.csv",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/CombinedAbiotics/merged_current-20241204-124526.csv",
         widget="FileChooser",
         required=True,
     )
@@ -72,7 +72,7 @@ def main():
         "-ds",
         "--datasheet",
         help='Datasheet containing dates and times at which to extract sensor data. (Column Format: "Date": "2024-07-11"; "Abiotics in": "15:08:00")(.xlsx)',
-        default="/home/fritz/Documents/3_Notebooks/MorganSensorData/data/TranslocationExperiment_DataEntry_20240713.xlsx",
+        default="/home/fritz/Documents/0_FieldWork/0_Buston_Rueger_PNG/4_Analysis/0_MorganAbiotics/TranslocationExperiment_DataEntry_20241103_ALL.xlsx",
         widget="FileChooser",
         required=False,
     )
@@ -101,6 +101,14 @@ def main():
         required=False,
     )
     parser.add_argument(
+        "-m",
+        "--merged",
+        help='Select if using already merged sensor datasheets across multiple measurement instances',
+        action="store_true",
+        default=False,
+        required=False,
+    )
+    parser.add_argument(
         "-o",
         "--output",
         widget="DirChooser",
@@ -123,30 +131,36 @@ def main():
 
     templight = pd.read_excel(args.temp_light)
     ph = pd.read_excel(args.ph)
-    conductivity = pd.read_csv(args.conductivity, skiprows=1)
-    do = pd.read_fwf(
-        args.dissolved_oxygen,
-        sep=",",
-        header=None,
-        skiprows=9,  # Skip header of file with unused rows
-        names=[
-            "Unix Timestamp (s)",
-            "UTC_Date",
-            "UTC Time",
-            "Greenwich Mean Date",
-            "Greenwich Mean Time",
-            "Battery (V)",
-            "Temperature (°C)",
-            "Dissolved Oxygen (mg/l)",
-            "Dissolved Oxygen Saturation (%)",
-            "Q",
-        ],
-    ).replace(",", "", regex=True)
+    if args.merged == True:
+        conductivity = pd.read_csv(args.conductivity)
+        do = pd.read_csv(args.dissolved_oxygen,
+        sep=",")
+    else:
+        conductivity = pd.read_csv(args.conductivity, skiprows=1)
+        do = pd.read_fwf(
+            args.dissolved_oxygen,
+            sep=",",
+            header=None,
+            skiprows=9,  # Skip header of file with unused rows
+            names=[
+                "Unix Timestamp (s)",
+                "UTC_Date",
+                "UTC Time",
+                "Greenwich Mean Date",
+                "Greenwich Mean Time",
+                "Battery (V)",
+                "Temperature (°C)",
+                "Dissolved Oxygen (mg/l)",
+                "Dissolved Oxygen Saturation (%)",
+                "Q",
+            ],
+        ).replace(",", "", regex=True)
     current = pd.read_csv(args.current)
     # timestamps = pd.read_csv(args.timestamps, header=None).to_numpy()
     # datasheet = pd.read_excel(args.datasheet)
     datasheet = pd.ExcelFile(args.datasheet)
     sheets = datasheet.sheet_names  # see all sheet names
+    sheets = np.array(sheets)[~np.isin(sheets, ['Anemone_Measurements', 'Fish_Measurements'])]
     datasheet = pd.concat(
         [pd.read_excel(args.datasheet, sheet_name=sheet) for sheet in sheets], axis=0
     ).reset_index()
@@ -199,7 +213,7 @@ def main():
     ph["PNG Timestamp"] = ph_timestamp
     ph["pH (pH) "] = pd.to_numeric(ph["pH (pH) "])
 
-    conductivity_timestamp = pd.to_datetime(conductivity["Date Time, GMT+10:00"])
+    conductivity_timestamp = pd.to_datetime(conductivity["Date Time, GMT+10:00"], format='%m/%d/%y %I:%M:%S %p')
     conductivity_timestamp = conductivity_timestamp.dt.tz_localize(
         png_time
     ).dt.tz_convert(
@@ -207,8 +221,8 @@ def main():
     )  # PNG Time
     conductivity["PNG Timestamp"] = conductivity_timestamp
 
-    do_timestamp = pd.to_datetime(do["Unix Timestamp (s)"], unit="s")  # UTC
-    do_timestamp = do_timestamp.dt.tz_localize(utc).dt.tz_convert(png_time)  # PNG Time
+    do_timestamp = pd.to_datetime(do["Unix Timestamp (s)"].to_numpy().astype(int), unit="s")  # UTC
+    do_timestamp = do_timestamp.tz_localize(utc).tz_convert(png_time)  # PNG Time
     do["PNG Timestamp"] = do_timestamp
     do["Dissolved Oxygen (mg/l)"] = pd.to_numeric(do["Dissolved Oxygen (mg/l)"])
 
@@ -300,6 +314,7 @@ def main():
                 shared_xaxes=True)
 
             # Light
+            templight = templight.sort_values(by='PNG Timestamp')
             fig.add_trace(
                 go.Scatter(
                     x=templight["PNG Timestamp"],
@@ -333,6 +348,7 @@ def main():
             )
 
             # Current
+            current = current.sort_values(by='PNG Timestamp')
             fig.add_trace(
                 go.Scatter(
                     x=current["PNG Timestamp"],
@@ -351,6 +367,7 @@ def main():
             )
 
             # pH
+            ph = ph.sort_values(by='PNG Timestamp')
             fig.add_trace(
                 go.Scatter(
                     x=ph["PNG Timestamp"], y=ph["pH (pH) "], mode="lines", name="pH"
@@ -361,6 +378,7 @@ def main():
             ylim_values.append([ph["pH (pH) "].min(), ph["pH (pH) "].max()])
 
             # Conductivity
+            conductivity = conductivity.sort_values(by='PNG Timestamp')
             fig.add_trace(
                 go.Scatter(
                     x=conductivity["PNG Timestamp"],
@@ -412,6 +430,7 @@ def main():
             )
 
             # Dissolved Oxygen
+            do = do.sort_values(by='PNG Timestamp')
             fig.add_trace(
                 go.Scatter(
                     x=do["PNG Timestamp"],
@@ -464,9 +483,9 @@ def main():
         except:
             fig, ax = plt.subplots(5, 1, figsize=(20, 10), sharex=True)
 
-            # Temperature & Light
+            # Temperature & Light 
             sns.lineplot(
-                data=templight,
+                data=templight.sort_values(by='PNG Timestamp'),
                 x="PNG Timestamp",
                 y="Light (lux) ",
                 ax=ax[0],
@@ -474,22 +493,22 @@ def main():
 
             # Current
             sns.lineplot(
-                data=current, x="PNG Timestamp", y="Speed (cm/s)", label="Current Speed", ax=ax[1]
+                data=current.sort_values(by='PNG Timestamp'), x="PNG Timestamp", y="Speed (cm/s)", label="Current Speed", ax=ax[1]
             )
         
             # pH
-            sns.lineplot(data=ph, x="PNG Timestamp", y="pH (pH) ", ax=ax[2])
+            sns.lineplot(data=ph.sort_values(by='PNG Timestamp'), x="PNG Timestamp", y="pH (pH) ", ax=ax[2])
 
             # Conductivity
             sns.lineplot(
-                data=conductivity,
+                data=conductivity.sort_values(by='PNG Timestamp'),
                 x="PNG Timestamp",
                 y="Low Range, μS/cm (LGR S/N: 21785664, SEN S/N: 21785664)",
                 ax=ax[3],
                 label="Low Range",
             )
             sns.lineplot(
-                data=conductivity,
+                data=conductivity.sort_values(by='PNG Timestamp'),
                 x="PNG Timestamp",
                 y="High Range, μS/cm (LGR S/N: 21785664, SEN S/N: 21785664)",
                 ax=ax[3],
